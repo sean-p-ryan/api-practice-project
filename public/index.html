@@ -10,23 +10,23 @@
 
 <body>
     <script>
+        let lat, lon, summary;
         if ('geolocation' in navigator) {
             console.log('geolocation available')
-            navigator.geolocation.getCurrentPosition(position => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                document.getElementById('latitude').textContent = lat;                
-                document.getElementById('longitude').textContent = lon;
+            navigator.geolocation.getCurrentPosition(async position => {
+                lat = position.coords.latitude;
+                lon = position.coords.longitude;                
+                document.getElementById('latitude').textContent = lat.toFixed(2);
+                document.getElementById('longitude').textContent = lon.toFixed(2);
 
-                const data = { lat, lon }
-                const options = {
-                    method: 'POST',
-                    headers: {
-                        'Cotent-Type': 'application/json'
-                    },
-                    body: 'haii'
-                };
-                fetch('/api', options);
+                const api_url = `weather/${lat},${lon}`;
+                const response = await fetch(api_url);
+                const json = await response.json();
+                console.log(json)
+                console.log(json.currently.summary)
+
+                summary = json.daily.summary;
+                document.getElementById('summary').textContent = summary;
             });
         } else {
             console.log('geolocation not available')
@@ -35,6 +35,7 @@
     <h1>Data Selfie Project</h1>
     <p>latitude: <span id='latitude'></span>&deg;<br /></p>
     <p>longitude: <span id='longitude'></span>&deg;<br /></p>
+    <p>Here's a summary of the weather forecase in  your area for the next three days: <br /><span id="summary"></span></p>
 </body>
 
 </html>
